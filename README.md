@@ -1,19 +1,13 @@
-# SIGNAL OTK TRADING V2 — prototype de surveillance
+# SIGNAL OTK V4 — moteur expérimental
 
-## Fonctionnel
-- Collecte serveur des bougies XAU/USD M5, M15, H1 et H4 via Twelve Data.
-- Tableau de bord noir et or, sans saisie manuelle des cours.
-- Tendance indicative par comparaison de la dernière clôture confirmée à une moyenne des 20 clôtures précédentes.
-- Aucun ordre, aucun signal de trading validé, aucune alerte push pour l'instant.
+## Installation Render
+Remplacer `app.py`, `index.html`, `requirements.txt` à la racine du dépôt privé. Ajouter `test_engine.py` pour tests locaux. Build : `pip install -r requirements.txt`. Start : `python app.py`. Variable secrète Render : `TWELVE_DATA_API_KEY`. Ne jamais la commiter.
 
-## Installation locale (ordinateur)
-1. Installer Python 3.10+.
-2. Dans le dossier : `python -m pip install -r requirements.txt`.
-3. Définir `TWELVE_DATA_API_KEY` dans les variables d'environnement (ne jamais la publier sur GitHub).
-4. Lancer `python app.py`, puis ouvrir `http://127.0.0.1:8080`.
+## Vérifications
+`python -m unittest test_engine.py` : tests hors ligne. `/api/status` : état de la collecte. Le tableau de bord actualise l'affichage toutes les 30 s mais les cours sont récupérés environ toutes les 10 minutes. La limite théorique est 576 requêtes/jour pour un seul processus (hors redémarrages). Attention : un deuxième serveur ou des redémarrages peuvent augmenter la consommation. Un compte Render gratuit se met en veille : surveillance 24/7 non garantie.
 
-## Déploiement permanent
-Déployer sur un hébergeur exécutant Python en continu, configurer `TWELVE_DATA_API_KEY` comme secret d'environnement et un accès HTTPS. Le serveur de développement Flask ne convient pas à la production; utiliser un serveur WSGI, une supervision et une authentification avant exposition publique. GitHub Pages seul ne peut pas exécuter le backend. Vérifier les quotas Twelve Data, la disponibilité, les fuseaux horaires et les coûts d'hébergement. La surveillance en arrière-plan et les notifications ne seront actives qu'après déploiement et configuration de services supplémentaires.
+## Sécurité et limites
+Aucun ordre ni alerte de trading réelle. Les tendances EMA20/EMA50, swing 20 et Fibonacci 50–61,8 % sont des hypothèses de travail et ne représentent pas une transcription validée de la formation. Les tests vérifient la cohérence logicielle, **pas** la performance d'une stratégie. L'horodatage des bougies est demandé en UTC et doit être vérifié sur l'API. La bougie la plus récente est exclue pour éviter les bougies incomplètes, mais l'exactitude de l'horodatage dépend du fournisseur.
 
-## Travail restant avant les signaux
-Formaliser les conditions objectives H4/H1/M15/M5 à partir de la vidéo (notamment structure, Fibonacci, liquidité, confirmation, ventes), intégrer spreads et caractéristiques Vantage, définir entrées/SL/TP, puis backtester hors échantillon. Aucun trade réel avant validation.
+## Prochain jalon
+Formaliser la stratégie de la vidéo, définir les entrées/sorties/invalidation sans ambiguïté, télécharger un historique suffisamment long, puis réaliser un backtest chronologique avec coûts/spreads/slippage, statistiques et validation hors échantillon. Ne pas utiliser pour prendre une position réelle.
